@@ -1,0 +1,520 @@
+{
+  "name": "Marketing Campaign Orchestrator - Fixed",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const campaign = $json.body;\n\n// Create new campaign object\nconst newCampaign = {\n  id: Date.now().toString(),\n  name: campaign.name,\n  startDate: campaign.startDate,\n  endDate: campaign.endDate,\n  goals: campaign.goals,\n  channels: campaign.channels,\n  status: 'draft',\n  metrics: {\n    impressions: 0,\n    clicks: 0,\n    engagement: 0,\n    conversions: 0\n  }\n};\n\n// Store campaign in global variable (simple storage)\nif (typeof global.campaigns === 'undefined') {\n  global.campaigns = [];\n}\nglobal.campaigns.push(newCampaign);\n\n// Return the new campaign\nreturn newCampaign;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -128
+      ],
+      "id": "a176e035-7c5b-4cd8-800d-020b8a3af7b4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-campaign",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        -128
+      ],
+      "id": "805eb2c8-57be-4399-a06c-c06095108755",
+      "name": "Create Campaign",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-content",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        32
+      ],
+      "id": "2449fb91-e7ff-4c39-82f8-7feccb268c5e",
+      "name": "Create Content Webhook",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const content = $json.body;\nreturn {\n  id: Date.now().toString(),\n  campaignId: content.campaignId,\n  type: content.type,\n  title: content.title,\n  body: content.body,\n  channels: content.channels,\n  status: 'draft',\n  metrics: {\n    impressions: 0,\n    clicks: 0,\n    likes: 0,\n    shares: 0\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        32
+      ],
+      "id": "9c772fef-33de-4b87-a811-61bc23cae452",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const scheduleData = $json.body;\nreturn {\n  success: true,\n  scheduledCount: scheduleData.items?.length || 1,\n  message: 'Content scheduled successfully'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        192
+      ],
+      "id": "d9bed417-1bbc-486e-b4e1-b313832a87cf",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "schedule",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        192
+      ],
+      "id": "f4c6d7d2-533c-4200-ba22-a2ad97b0b135",
+      "name": "Schedule Content Webhook",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  overview: {\n    totalImpressions: 45000,\n    totalClicks: 1200,\n    totalEngagement: 8.5,\n    totalConversions: 85,\n    ctr: 2.67,\n    conversionRate: 7.08\n  },\n  byPlatform: [\n    { platform: 'LinkedIn', impressions: 25000, clicks: 750, engagement: 9.2 },\n    { platform: 'Twitter', impressions: 15000, clicks: 350, engagement: 7.1 },\n    { platform: 'Slack', impressions: 5000, clicks: 100, engagement: 8.8 }\n  ],\n  timeline: [\n    { date: '2024-01-15', impressions: 2000, clicks: 60, engagement: 8.0 },\n    { date: '2024-01-16', impressions: 2500, clicks: 75, engagement: 8.5 },\n    { date: '2024-01-17', impressions: 3000, clicks: 90, engagement: 9.0 }\n  ]\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        368
+      ],
+      "id": "bf496648-6996-4760-8f4d-29382b6ea469",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "path": "analytics",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        368
+      ],
+      "id": "e2f2aa4b-d973-419d-a422-6da23e914317",
+      "name": "Analytics Webhook",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  status: 'connected',\n  message: 'n8n connection successful',\n  timestamp: new Date().toISOString()\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        528
+      ],
+      "id": "955a2a75-4d90-406d-8347-10689ed65f88",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "path": "health",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        528
+      ],
+      "id": "87061fe1-97f5-44fb-854a-a3b5bb0d798d",
+      "name": "Health Check Webhook",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "path": "campaigns",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        688
+      ],
+      "id": "get-campaigns-webhook",
+      "name": "Get Campaigns Webhook",
+      "webhookId": "d54a94b1-2d92-408d-a14b-2ca92751c349"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// For demo purposes, return some sample campaigns\n// In a real setup, you'd connect to a database\nreturn [\n  {\n    id: '1',\n    name: 'Q1 Product Launch',\n    startDate: '2024-01-15',\n    endDate: '2024-03-15',\n    status: 'active',\n    channels: ['linkedin', 'twitter', 'slack'],\n    goals: 'Increase brand awareness and drive product adoption',\n    metrics: { impressions: 45000, clicks: 1200, engagement: 8.5, conversions: 85 }\n  },\n  {\n    id: '2',\n    name: 'Holiday Campaign',\n    startDate: '2024-12-01',\n    endDate: '2024-12-31',\n    status: 'scheduled',\n    channels: ['linkedin', 'twitter'],\n    goals: 'Drive holiday sales and engagement',\n    metrics: { impressions: 0, clicks: 0, engagement: 0, conversions: 0 }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        688
+      ],
+      "id": "get-campaigns-code",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        32
+      ],
+      "id": "325df0da-6a1f-409d-a884-3d7208b3176f",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        192
+      ],
+      "id": "13358e46-64b7-4807-b59e-e4b0e12cbb9e",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        368
+      ],
+      "id": "3ece93d7-4aaf-437e-8551-1e5d3d3cc76f",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        528
+      ],
+      "id": "b3985ba8-6767-4699-bd4c-75cd3c3b2aec",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        -128
+      ],
+      "id": "cb4de4a6-c2b7-4ba7-a88e-022089676014",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-API-KEY"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        688
+      ],
+      "id": "get-campaigns-respond",
+      "name": "Respond to Webhook5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Campaign": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Content Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Content Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analytics Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Check Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Campaigns Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8187ff1c-fcd3-4875-8133-19cd98a918d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "22ed5d3881b62d1e6be18e372d76113f33171f37668a636b00c4425fc3018a84"
+  },
+  "id": "UYAu2w5li48Hhz46",
+  "tags": []
+}
