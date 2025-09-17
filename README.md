@@ -276,17 +276,3 @@ If you encounter any issues:
 2. Verify your n8n webhook configuration
 3. Test the connection in Settings
 4. Enable mock data mode for troubleshooting
-
-## 🔮 Roadmap
-
-- [ ] Email marketing integration (Mailchimp, SendGrid)
-- [ ] Advanced scheduling with AI optimization
-- [ ] Team collaboration features
-- [ ] Custom analytics dashboards
-- [ ] Mobile app companion
-- [ ] Advanced A/B testing
-- [ ] Integration with more social platforms
-
----
-
-**Built with ❤️ for modern marketing teams**
